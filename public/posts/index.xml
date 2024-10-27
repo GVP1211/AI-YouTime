@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lessons on AI Learning</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Lessons on AI Learning</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 27 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Lesson 1- An introduction to AI</title>
+      <link>http://localhost:1313/posts/lesson-1---an-introduction-to-ai/</link>
+      <pubDate>Sun, 27 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lesson-1---an-introduction-to-ai/</guid>
+      <description>An introduction to AI&#xD;#&#xD;Artificial intelligence can be found anywhere, both on the internet or in the devices you use such as YouTube recommendations or a self-braking car.&#xA;What is AI?&#xD;#&#xD;Artificial intelligence is an algorithm that can learn patterns and make predictions on a certain topic. AI is used with computer science to solve real world problems. AI can also be used to help humans with their tasks and that is called augmented reality, such as a navigation system or a text reader for the blind.</description>
+    </item>
+    <item>
+      <title>Lesson 2 - Types of AI</title>
+      <link>http://localhost:1313/posts/lesson-2---types-of-ai/</link>
+      <pubDate>Sun, 27 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lesson-2---types-of-ai/</guid>
+      <description>Types of AI&#xD;#&#xD;Narrow, broad, and general AI&#xD;#&#xD;A way to categorise AI is by the number of different tasks it can accomplish. The simplest of AI started from narrow AI which performs a few specific tasks (examples are virtual assistants/ Siri, image classification, recommendation like YouTube). Expanding from narrow AI, is broad AI, it has a large range of tasks it can accomplish. The next level of AI is general AI which performs human-like functions and has the ability to learn like humans can.</description>
+    </item>
+    <item>
+      <title>Lesson 3 - Neural networks</title>
+      <link>http://localhost:1313/posts/lesson-3---neural-networks/</link>
+      <pubDate>Sun, 27 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lesson-3---neural-networks/</guid>
+      <description>Neural networks&#xD;#&#xD;A neural network is one of the main building blocks in any artificial intelligence model. A neural network can take input data and output a probability of an output through mathematical functions.&#xA;Layers&#xD;#&#xD;A neural network is made up of nodes. Each node can hold a value, typically between 0 and 1. Multiple nodes can make up a layer. The network will have 1 input layer and 1 output layer.</description>
+    </item>
+    <item>
+      <title>Lesson 4 - MNIST neural network</title>
+      <link>http://localhost:1313/posts/lesson-4---mnist-neural-network/</link>
+      <pubDate>Sun, 27 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lesson-4---mnist-neural-network/</guid>
+      <description>Making your first neural network from scratch&#xD;#&#xD;For the first model, we will be making a model that can recognise hand written numbers using the MNIST dataset.&#xA;Designing the model&#xD;#&#xD;Firstly, the MNIST database contains 70000 handwritten numbers in a grey-scale 28 x 28 bitmap image. The database will have a 2-D array containing the pixels each with a value between 0 to 255 on the grey-scale and a seperate array of data with the labels.</description>
+    </item>
+  </channel>
+</rss>

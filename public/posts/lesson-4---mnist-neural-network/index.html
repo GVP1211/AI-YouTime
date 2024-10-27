@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Making your first neural network from scratch#For the first model, we will be making a model that can recognise hand written numbers using the MNIST dataset.
+Designing the model#Firstly, the MNIST database contains 70000 handwritten numbers in a grey-scale 28 x 28 bitmap image. The database will have a 2-D array containing the pixels each with a value between 0 to 255 on the grey-scale and a seperate array of data with the labels.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/posts/lesson-4---mnist-neural-network/">
+  <meta property="og:site_name" content="AI Learning">
+  <meta property="og:title" content="Lesson 4 - MNIST neural network">
+  <meta property="og:description" content="Making your first neural network from scratch#For the first model, we will be making a model that can recognise hand written numbers using the MNIST dataset.
+Designing the model#Firstly, the MNIST database contains 70000 handwritten numbers in a grey-scale 28 x 28 bitmap image. The database will have a 2-D array containing the pixels each with a value between 0 to 255 on the grey-scale and a seperate array of data with the labels.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-10-27T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-27T00:00:00+00:00">
+<title>Lesson 4 - MNIST neural network | AI Learning</title>
+<link rel="icon" href="/favicon.png" >
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="http://localhost:1313/posts/lesson-4---mnist-neural-network/">
+<link rel="stylesheet" href="/book.min.6c8b9d2a1fc95075ed7da46ca81060b39add8fff6741ac51259f768929281e2c.css" integrity="sha256-bIudKh/JUHXtfaRsqBBgs5rdj/9nQaxRJZ92iSkoHiw=" crossorigin="anonymous">
+  <script defer src="/fuse.min.js"></script>
+  <script defer src="/en.search.min.e57244fd98d33e48595041bb63e0b4f2e64740145cd1f41090b090ef9f07956c.js" integrity="sha256-5XJE/ZjTPkhZUEG7Y&#43;C08uZHQBRc0fQQkLCQ758HlWw=" crossorigin="anonymous"></script>
+
+  
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/"><span>AI Learning</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+<ul>
+  
+  <li>
+    <a href="/posts/"  >
+        Lessons
+      </a>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Lesson 4 - MNIST neural network</h3>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#designing-the-model">Designing the model</a>
+      <ul>
+        <li><a href="#initialisation">Initialisation</a></li>
+        <li><a href="#forward-propagation">Forward propagation</a></li>
+        <li><a href="#backward-propagation">Backward propagation</a></li>
+        <li><a href="#gradient-descent">Gradient descent</a></li>
+      </ul>
+    </li>
+    <li><a href="#coding">Coding</a>
+      <ul>
+        <li><a href="#initialisation-1">Initialisation</a></li>
+        <li><a href="#forward-propagation-1">Forward propagation</a></li>
+        <li><a href="#backward-propagation-1">Backward propagation</a></li>
+        <li><a href="#gradient-descent-1">Gradient descent</a></li>
+        <li><a href="#testing-our-model">Testing our model</a></li>
+        <li><a href="#exercises">Exercises</a></li>
+        <li><a href="#references">References</a></li>
+        <li><a href="#further-reading">Further reading</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+<article class="markdown book-post">
+  <h2>
+    Lesson 4 - MNIST neural network
+  </h2>
+  
+  <div class="flex align-center text-small book-post-date">
+    <img src="/svg/calendar.svg" class="book-icon " alt="" />
+    <span>October 27, 2024</span>
+  </div>
+
+
+
+  
+
+  
+
+
+  <div class="book-post-content"><h1 id="making-your-first-neural-network-from-scratch">
+  Making your first neural network from scratch
+  <a class="anchor" href="#making-your-first-neural-network-from-scratch">#</a>
+</h1>
+<p>For the first model, we will be making a model that can recognise hand written numbers using the MNIST dataset.</p>
+<h2 id="designing-the-model">
+  Designing the model
+  <a class="anchor" href="#designing-the-model">#</a>
+</h2>
+<p>Firstly, the MNIST database contains 70000 handwritten numbers in a grey-scale 28 x 28 bitmap image. The database will have a 2-D array containing the pixels each with a value between 0 to 255 on the grey-scale and a seperate array of data with the labels.
+This means there are 784 pixels in total per input data, therefore we will have 784 input nodes.</p>
+<p>Next, we will have 1 hidden layer for simplicity&rsquo;s sake, this layer will have 40 nodes. Then we will have an output layer of 10 nodes. Each output node corresponding to a digit from 0 to 10.</p>
+<h3 id="initialisation">
+  Initialisation
+  <a class="anchor" href="#initialisation">#</a>
+</h3>
+<ol>
+<li>Firstly, we will fetch the data from the MNIST data base, we will assign the bitmap images to X and X_test, the labels as Y and Y_test.</li>
+<li>Initialising weights and biases; the weights between input and layer 2 will be names W1 and the size [40, 784], W2 for layer 2 and output layer will have a size of [10, 40]. We will also have a bias for the input layer and layer 2 named B1 and B2 with size [1, 40] and [1, 10] respectively.</li>
+</ol>
+<h3 id="forward-propagation">
+  Forward propagation
+  <a class="anchor" href="#forward-propagation">#</a>
+</h3>
+<ol>
+<li>When propagating from the input layer to the second layer we will take the dot product of X and W1 then add it to B1 to obtain Z1. The dot product takes every single bitmap image and multiplies each of them by our weight.</li>
+<li>Then we need to put Z1 through the activation function. For this model, we will use a sigmoid curve which is the function f(x) = 1/(1-e^-x). The result is A1 which is our second layer.</li>
+<li>We then take the dot product of A1 and W2 then add to B2 to obtain our output layer which is called Z2. We can then put Z2 through an activation function called softmax function. A softmax function takes a set of numbers and changes them to a probability based on how high each of the numbers were.</li>
+</ol>
+<h3 id="backward-propagation">
+  Backward propagation
+  <a class="anchor" href="#backward-propagation">#</a>
+</h3>
+<p>This section can be skipped if you don&rsquo;t understand calculus and the chain rule.</p>
+<ol>
+<li>Firstly, we calculate the differentiated value of Z2 or dZ2 which is dZ2 = A2 - one_hot(Y). one_hot(Y) means we are creating an array where all the values are 0 and the index of Y is 1. However, we need to divide dZ2 by the size of Y as we will be summing dZ2 for our bias.</li>
+<li>Next we differentiate W2 in terms of Z2 so we get A1, then applying the chain rule to get dW2 in terms of the loss, we multiply with dZ2. So we get dW2 = dZ2 x A1</li>
+<li>When diffrentiating B2 in terms of Z2 we get 1, so applying the chain rule again to get dB2 in terms of the loss, we get dB2 = sum of Z2.</li>
+<li>To differentiate A1 in terms of Z2 we get W2, applying the chain rule to get dA1 in terms of the loss, we multiple W2 with dZ2. So we get dA1 = W2 x dZ2.</li>
+<li>Next we need to find the derivative of Z1, since A1 = sigmoid(Z1), we need to find the derivative of the sigmoid function which is f(x) x (1-f(x)) where f(x) is the sigmoid function. Let deriv_sigmoid(x) be the derivative of f(x). Then to find dZ1 we use the chain rule and get dZ1 = dA1 x deriv_sigmoid(Z1).</li>
+<li>Similar to step 2 and 3, we get dW1 = X * dZ1 and dB1 = sum of dZ1.</li>
+</ol>
+<h3 id="gradient-descent">
+  Gradient descent
+  <a class="anchor" href="#gradient-descent">#</a>
+</h3>
+<p>In gradient descent there are 4 main steps:</p>
+<ol>
+<li>Forward propagation.</li>
+<li>Backward propagation</li>
+<li>Update parameters (weights and biases). For this we take our original weights and biases then subtract by the respective derivatives multiplied by the learning rate.</li>
+<li>Track our accuracy on both train and test data.
+These 4 steps will looped a certain amount of time until the model is accurate enough to be used.</li>
+</ol>
+<h2 id="coding">
+  Coding
+  <a class="anchor" href="#coding">#</a>
+</h2>
+<p>This code will be done in google colab.</p>
+<h3 id="initialisation-1">
+  Initialisation
+  <a class="anchor" href="#initialisation-1">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/tmp&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(url): <span style="color:#75715e">#This code can be ignored, it is just fetching data from a online file</span>
+</span></span><span style="display:flex;"><span>  fp <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, hashlib<span style="color:#f92672">.</span>md5(url<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>))<span style="color:#f92672">.</span>hexdigest())
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(fp):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(fp, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>      data <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(fp, <span style="color:#e6db74">&#34;wb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>      data <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url)<span style="color:#f92672">.</span>content
+</span></span><span style="display:flex;"><span>      f<span style="color:#f92672">.</span>write(data)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>frombuffer(gzip<span style="color:#f92672">.</span>decompress(data), dtype<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>uint8)<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;https://github.com/sunsided/mnist/raw/master/train-images-idx3-ubyte.gz&#34;</span>)[<span style="color:#ae81ff">0x10</span>:]<span style="color:#f92672">.</span>reshape((<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">28</span><span style="color:#f92672">*</span><span style="color:#ae81ff">28</span>))<span style="color:#f92672">.</span>T <span style="color:#75715e">#shaping data into a 2d array of size [x, 784], x is whatever number to make the data fit (60000). Then .T is to transpose the data from rows to columns and vice versa. This makes the data easier to work with.</span>
+</span></span><span style="display:flex;"><span>Y <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;https://github.com/sunsided/mnist/raw/master/train-labels-idx1-ubyte.gz&#34;</span>)[<span style="color:#ae81ff">8</span>:]<span style="color:#f92672">.</span>T<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;int&#39;</span>) <span style="color:#75715e">#fetching labels, transpose and change to int data type</span>
+</span></span><span style="display:flex;"><span>X_test <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;https://github.com/sunsided/mnist/raw/master/t10k-images-idx3-ubyte.gz&#34;</span>)[<span style="color:#ae81ff">0x10</span>:]<span style="color:#f92672">.</span>reshape((<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">28</span><span style="color:#f92672">*</span><span style="color:#ae81ff">28</span>))<span style="color:#f92672">.</span>T
+</span></span><span style="display:flex;"><span>Y_test <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;https://github.com/sunsided/mnist/raw/master/t10k-labels-idx1-ubyte.gz&#34;</span>)[<span style="color:#ae81ff">8</span>:]<span style="color:#f92672">.</span>T<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;int&#39;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>X <span style="color:#f92672">=</span> X <span style="color:#f92672">/</span> <span style="color:#ae81ff">255.0</span> <span style="color:#75715e"># since data is between 0 and 255, we divide it by 255 to have the values between 0 and 1, this is called data normalisation.</span>
+</span></span><span style="display:flex;"><span>X_test <span style="color:#f92672">=</span> X_test <span style="color:#f92672">/</span> <span style="color:#ae81ff">255.0</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init_params</span>(): <span style="color:#75715e"># Initialiing all weights and parameters as a random number between -0.5 and 0.5 (data type double is just a float number that can have more significant figures)</span>
+</span></span><span style="display:flex;"><span>  W1 <span style="color:#f92672">=</span> (np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>rand(<span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">784</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>)<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;double&#39;</span>)
+</span></span><span style="display:flex;"><span>  b1 <span style="color:#f92672">=</span> (np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>rand(<span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>)<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;double&#39;</span>)
+</span></span><span style="display:flex;"><span>  W2 <span style="color:#f92672">=</span> (np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>rand(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">40</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>)<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;double&#39;</span>)
+</span></span><span style="display:flex;"><span>  b2 <span style="color:#f92672">=</span> (np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>rand(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>)<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;double&#39;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> W1, b1, W2, b2
+</span></span></code></pre></div><h3 id="forward-propagation-1">
+  Forward propagation
+  <a class="anchor" href="#forward-propagation-1">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">sigmoid</span>(Z): <span style="color:#75715e">#Activation function is to increase complexity and make the model non-linear, it also compresses all values to between 0 and 1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>np<span style="color:#f92672">.</span>exp(<span style="color:#f92672">-</span>Z))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">softmax</span>(Z): <span style="color:#75715e">#Softmax function reduces all numbers in an array to a probability between 0 and 1, sum of all elements should be 1</span>
+</span></span><span style="display:flex;"><span>  exp_element<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>exp(Z<span style="color:#f92672">-</span>Z<span style="color:#f92672">.</span>max())
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> exp_element<span style="color:#f92672">/</span>np<span style="color:#f92672">.</span>sum(exp_element,axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward_prop</span>(W1, b1, W2, b2, X): <span style="color:#75715e">#forward propagation</span>
+</span></span><span style="display:flex;"><span>  Z1 <span style="color:#f92672">=</span> W1<span style="color:#f92672">.</span>dot(X) <span style="color:#f92672">+</span> b1
+</span></span><span style="display:flex;"><span>  A1 <span style="color:#f92672">=</span> sigmoid(Z1)
+</span></span><span style="display:flex;"><span>  Z2 <span style="color:#f92672">=</span> W2<span style="color:#f92672">.</span>dot(A1) <span style="color:#f92672">+</span> b2
+</span></span><span style="display:flex;"><span>  A2 <span style="color:#f92672">=</span> softmax(Z2)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> Z1, A1, Z2, A2
+</span></span></code></pre></div><h3 id="backward-propagation-1">
+  Backward propagation
+  <a class="anchor" href="#backward-propagation-1">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deriv_sigmoid</span>(Z):
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> sigmoid(Z)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>sigmoid(Z)) <span style="color:#75715e">#Derivative of the sigmoid function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">back_prop</span>(Z1, A1, Z2, A2, W1, W2, X, Y): <span style="color:#75715e">#Back propagation, calculus</span>
+</span></span><span style="display:flex;"><span>  dZ2 <span style="color:#f92672">=</span> (A2 <span style="color:#f92672">-</span> one_hot(Y))<span style="color:#f92672">/</span>Y<span style="color:#f92672">.</span>size
+</span></span><span style="display:flex;"><span>  dW2 <span style="color:#f92672">=</span> dZ2<span style="color:#f92672">.</span>dot(A1<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>  db2 <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sum(dZ2, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, keepdims <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>  dA1 <span style="color:#f92672">=</span> W2<span style="color:#f92672">.</span>T<span style="color:#f92672">.</span>dot(dZ2)
+</span></span><span style="display:flex;"><span>  dZ1 <span style="color:#f92672">=</span> dA1 <span style="color:#f92672">*</span> deriv_sigmoid(Z1)
+</span></span><span style="display:flex;"><span>  dW1 <span style="color:#f92672">=</span> dZ1<span style="color:#f92672">.</span>dot(X<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>  db1 <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sum(dZ1, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, keepdims <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> dW1, db1, dW2, db2 <span style="color:#75715e">#These values tell how much each weight and bias has to be adjusted by</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update_params</span>(W1, b1, W2, b2, dW1, db1, dW2, db2, lr): <span style="color:#75715e">#Update parameters, lr is the learning rate</span>
+</span></span><span style="display:flex;"><span>  W1 <span style="color:#f92672">=</span> W1 <span style="color:#f92672">-</span> lr <span style="color:#f92672">*</span> dW1
+</span></span><span style="display:flex;"><span>  b1 <span style="color:#f92672">=</span> b1 <span style="color:#f92672">-</span> lr <span style="color:#f92672">*</span> db1
+</span></span><span style="display:flex;"><span>  W2 <span style="color:#f92672">=</span> W2 <span style="color:#f92672">-</span> lr <span style="color:#f92672">*</span> dW2
+</span></span><span style="display:flex;"><span>  b2 <span style="color:#f92672">=</span> b2 <span style="color:#f92672">-</span> lr <span style="color:#f92672">*</span> db2
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> W1, b1, W2, b2
+</span></span></code></pre></div><h3 id="gradient-descent-1">
+  Gradient descent
+  <a class="anchor" href="#gradient-descent-1">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_predictions</span>(A2): <span style="color:#75715e">#Gives an output prediction</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>argmax(A2, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_accuracy</span>(predictions, Y): <span style="color:#75715e">#Calculates accuracy based on all predictions and all lables</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>sum(predictions <span style="color:#f92672">==</span> Y) <span style="color:#f92672">/</span> Y<span style="color:#f92672">.</span>size
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">gradient_descent</span>(X, Y, X_test, Y_test, lr, epochs, accuracies, test_accuracies, W1 <span style="color:#f92672">=</span> [], b1 <span style="color:#f92672">=</span> [], W2 <span style="color:#f92672">=</span> [], b2 <span style="color:#f92672">=</span> []): <span style="color:#75715e">#Training the model</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(epochs):
+</span></span><span style="display:flex;"><span>    Z1, A1, Z2, A2 <span style="color:#f92672">=</span> forward_prop(W1, b1, W2, b2, X) <span style="color:#75715e">#forward propagation</span>
+</span></span><span style="display:flex;"><span>    dW1, db1, dW2, db2 <span style="color:#f92672">=</span> back_prop(Z1, A1, Z2, A2, W1, W2, X, Y) <span style="color:#75715e">#back propagation</span>
+</span></span><span style="display:flex;"><span>    W1, b1, W2, b2 <span style="color:#f92672">=</span> update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, lr) <span style="color:#75715e">#update weights and biases</span>
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> get_predictions(A2)
+</span></span><span style="display:flex;"><span>    accuracies<span style="color:#f92672">.</span>append(get_accuracy(predictions, Y)) <span style="color:#75715e">#Keep track of accuracy whilst training</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i <span style="color:#f92672">%</span> <span style="color:#ae81ff">50</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>      print(<span style="color:#e6db74">&#34;Iteration: &#34;</span>, i)
+</span></span><span style="display:flex;"><span>      print(get_accuracy(predictions, Y)) <span style="color:#75715e">#prints accuracy whilst training every 50 loops</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> W1, b1, W2, b2, A2, accuracies, test_accuracies
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>accuracies <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>test_accuracies <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>W1, b1, W2, b2, A2, accuracies, test_accuracies <span style="color:#f92672">=</span> gradient_descent(X, Y, X_test, Y_test, <span style="color:#ae81ff">0.70</span>, <span style="color:#ae81ff">200</span>, accuracies, test_accuracies)
+</span></span></code></pre></div><h3 id="testing-our-model">
+  Testing our model
+  <a class="anchor" href="#testing-our-model">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">make_predictions</span>(X, W1, b1, W2, b2): <span style="color:#75715e">#Get prediction based on a dataset</span>
+</span></span><span style="display:flex;"><span>    _, _, _, A2 <span style="color:#f92672">=</span> forward_prop(W1, b1, W2, b2, X)
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> get_predictions(A2)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> predictions
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_prediction</span>(index, W1, b1, W2, b2): <span style="color:#75715e">#Get prediction based on 1 image from test dataset as well as plot image</span>
+</span></span><span style="display:flex;"><span>    current_image <span style="color:#f92672">=</span> X_test[:, index, <span style="color:#66d9ef">None</span>]
+</span></span><span style="display:flex;"><span>    prediction <span style="color:#f92672">=</span> make_predictions(X_test[:, index, <span style="color:#66d9ef">None</span>], W1, b1, W2, b2)
+</span></span><span style="display:flex;"><span>    label <span style="color:#f92672">=</span> Y_test[index]
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Prediction: &#34;</span>, prediction)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Label: &#34;</span>, label)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    current_image <span style="color:#f92672">=</span> current_image<span style="color:#f92672">.</span>reshape((<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>gray()
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>imshow(current_image, interpolation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;nearest&#39;</span>)
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>show()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>predictions <span style="color:#f92672">=</span> make_predictions(X_test, W1, b1, W2, b2) <span style="color:#75715e">#Get accuracy from the test/ validation data</span>
+</span></span><span style="display:flex;"><span>test_accuracy <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sum(predictions <span style="color:#f92672">==</span> Y_test) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span> <span style="color:#f92672">/</span> Y_test<span style="color:#f92672">.</span>size
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Accuracy = &#34;</span>, test_accuracy ,<span style="color:#e6db74">&#34;%&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>test_prediction(<span style="color:#ae81ff">93</span>, W1, b1, W2, b2) <span style="color:#75715e"># Test from test image dataset</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> skimage.draw <span style="color:#f92672">import</span> line_aa 
+</span></span><span style="display:flex;"><span>img <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">14</span>, <span style="color:#ae81ff">14</span>), dtype<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>uint8)
+</span></span><span style="display:flex;"><span>rr, cc, val <span style="color:#f92672">=</span> line_aa(<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span>img[rr, cc] <span style="color:#f92672">=</span> val <span style="color:#f92672">*</span> <span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>rr, cc, val <span style="color:#f92672">=</span> line_aa(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">8</span>)
+</span></span><span style="display:flex;"><span>img[rr, cc] <span style="color:#f92672">=</span> val <span style="color:#f92672">*</span> <span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>rr, cc, val <span style="color:#f92672">=</span> line_aa(<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>img[rr, cc] <span style="color:#f92672">=</span> val <span style="color:#f92672">*</span> <span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>rr, cc, val <span style="color:#f92672">=</span> line_aa(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">8</span>)
+</span></span><span style="display:flex;"><span>img[rr, cc] <span style="color:#f92672">=</span> val <span style="color:#f92672">*</span> <span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">13</span>):
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">13</span>):
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j] <span style="color:#f92672">=</span> img[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j] <span style="color:#f92672">=</span> img[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> img[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> img[i][j]
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> n_test<span style="color:#f92672">/</span><span style="color:#ae81ff">255</span>
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> n_test<span style="color:#f92672">.</span>reshape(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>imshow(n_test<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">28</span>,<span style="color:#ae81ff">28</span>))
+</span></span><span style="display:flex;"><span>prediction2 <span style="color:#f92672">=</span> make_predictions(n_test, W1, b1, W2, b2)
+</span></span><span style="display:flex;"><span>print(prediction2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>]]
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">13</span>):
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">13</span>):
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j] <span style="color:#f92672">=</span> n[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j] <span style="color:#f92672">=</span> n[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> n[i][j]
+</span></span><span style="display:flex;"><span>    n_test[<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>j<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> n[i][j]
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> n_test<span style="color:#f92672">/</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>n_test <span style="color:#f92672">=</span> n_test<span style="color:#f92672">.</span>reshape(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>imshow(n_test<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">28</span>,<span style="color:#ae81ff">28</span>))
+</span></span><span style="display:flex;"><span>prediction2 <span style="color:#f92672">=</span> make_predictions(n_test, W1, b1, W2, b2)
+</span></span><span style="display:flex;"><span>print(prediction2)
+</span></span></code></pre></div><h3 id="exercises">
+  Exercises
+  <a class="anchor" href="#exercises">#</a>
+</h3>
+<p>Once the code is completed, here are some challenges you could do:</p>
+<ol>
+<li>Keep track of the test accuracy as the model is being trained.</li>
+<li>Try different things to increase accuracy as high as possible</li>
+<li>Are there any other different activation or loss functions you could use?</li>
+</ol>
+<h3 id="references">
+  References
+  <a class="anchor" href="#references">#</a>
+</h3>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=w8yWXqWQYmU&amp;t=532s">https://www.youtube.com/watch?v=w8yWXqWQYmU&t=532s</a></li>
+<li><a href="https://www.geeksforgeeks.org/ml-one-hot-encoding/">https://www.geeksforgeeks.org/ml-one-hot-encoding/</a></li>
+<li><a href="https://davidbieber.com/snippets/2020-12-12-derivative-of-softmax-and-the-softmax-cross-entropy-loss">https://davidbieber.com/snippets/2020-12-12-derivative-of-softmax-and-the-softmax-cross-entropy-loss</a></li>
+<li><a href="https://github.com/sunsided/mnist">https://github.com/sunsided/mnist</a></li>
+</ul>
+<h3 id="further-reading">
+  Further reading
+  <a class="anchor" href="#further-reading">#</a>
+</h3>
+<ul>
+<li><a href="https://www.ibm.com/topics/overfitting">https://www.ibm.com/topics/overfitting</a></li>
+</ul>
+</div>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#designing-the-model">Designing the model</a>
+      <ul>
+        <li><a href="#initialisation">Initialisation</a></li>
+        <li><a href="#forward-propagation">Forward propagation</a></li>
+        <li><a href="#backward-propagation">Backward propagation</a></li>
+        <li><a href="#gradient-descent">Gradient descent</a></li>
+      </ul>
+    </li>
+    <li><a href="#coding">Coding</a>
+      <ul>
+        <li><a href="#initialisation-1">Initialisation</a></li>
+        <li><a href="#forward-propagation-1">Forward propagation</a></li>
+        <li><a href="#backward-propagation-1">Backward propagation</a></li>
+        <li><a href="#gradient-descent-1">Gradient descent</a></li>
+        <li><a href="#testing-our-model">Testing our model</a></li>
+        <li><a href="#exercises">Exercises</a></li>
+        <li><a href="#references">References</a></li>
+        <li><a href="#further-reading">Further reading</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
